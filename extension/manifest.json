@@ -1,0 +1,24 @@
+{
+    "name": "Youtube Friends",
+    "description": "",
+    "version": "1.0",
+    "manifest_version": 2,
+    "browser_action": {
+        "default_popup": "popup.html",
+		"default_icon": "./sources/YouTube Friends.png"
+    },
+    "permissions": [
+        "tabs",
+        "<all_urls>"
+    ],
+    "background": {
+        "scripts": ["background_v2.js"],
+        "persistent": true
+    },
+    "content_scripts": [
+        {
+            "matches": ["<all_urls>"],
+            "js": ["content.js"]
+        }
+    ]
+  }

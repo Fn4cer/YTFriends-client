@@ -1,0 +1,128 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
+
+*{
+  --color-primary: #FF0000;
+  --color-secondary: #aaa;
+  --color-default: white;
+
+  color: var(--color-secondary);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1rem;
+}
+
+html{
+  height: auto;
+}
+
+body{
+  background: #282828;
+  color:white;
+  align-items: stretch;
+  box-sizing: content-box;
+  display: flex;
+  flex-direction: column;
+  margin: auto;
+  padding: 1rem;
+  position: relative;
+  width: 20rem;
+  height: auto;
+}
+
+h1{
+  font-weight: 700;
+  font-size: 1.6rem;
+  color: var(--color-primary);
+  text-align: center;
+  margin: 0;
+}
+
+h2{
+  margin:0;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+h3{
+  margin:0;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--color-default);
+}
+
+h4{
+  margin:0;
+  font-weight: 400;
+  color: var(--color-default);
+}
+
+a{
+  text-decoration: none;
+}
+
+.watch_status{
+  margin-bottom: 5px;
+  color: var(--color-default);
+}
+
+.videotitle{
+  color: var(--color-secondary);
+  margin-bottom: 5px;
+}
+
+.channelname{
+  color: var(--color-default);
+}
+
+section{
+  border: 1px solid white;
+  border-radius: 5px;
+  margin: 10px 0;
+  padding: 10px;
+}
+
+input[type="text"]{
+  background: none;
+  border: 1px solid;
+  border-color: white;
+  border-radius: 5px;
+  padding: 10px;
+}
+
+input[type="text"]:focus{
+  outline: none;
+  border-color: #FF0000;
+}
+
+input[type="button"]{
+  background: none;
+  border: 1px solid white;
+  border-radius: 5px;
+  padding: 10px;
+}
+
+input[type="button"]:hover{
+  cursor: pointer;
+  color: #FF0000;
+  font-weight: 700;
+  background: white;
+  outline: none;
+}
+
+ul#users{
+  list-style: none;
+  margin: 10px 0 0 0;
+  padding: 0;
+}
+
+ul.userdetails{
+  list-style: none;
+  list-style-position: outside;
+  padding: 0 20px 0 20px;
+  margin-top: 5px;
+}
+
+.user{
+  margin: 0 0 10px 0;
+}

@@ -1,0 +1,5 @@
+{
+    "POSTURL": "http://35.246.233.0/api/putuser",
+    "GETURL": "http://35.246.233.0/api/getusername",
+    "USERSURL": "http://35.246.233.0/api/users"
+}
