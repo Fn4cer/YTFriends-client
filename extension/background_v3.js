@@ -15,7 +15,9 @@ async function initBackgroundScript(){
 
     //initialize identification --> client_key
     clientKey = await initClientKey();
-    console.log("clientKey initialized: ", clientKey);
+    chrome.storage.local.get('clientKey', function(res){
+        console.log("clientKey initialized: ", res);
+    });
 
     //initialize username
     username = await initUsername();
@@ -52,33 +54,44 @@ async function initConfig(){
 
 async function initClientKey(){
     return new Promise(async (resolve, reject) => {
-        //get currently saved clientKey
-        var currClientKey;
-        chrome.storage.local.get('clientKey', function(res){
-            currClientKey = res;
-        })
 
+        //get currently saved clientKey
+        var currClientKey = await new Promise((resolve, reject) => {
+            chrome.storage.local.get('clientKey', function(res){
+                resolve(res);
+            })
+        });
+        
         //check if clientKey is valid, else get valid key
         var finalClientKey;
+
         await new Promise((resolve, reject) => {
+
             fetch(config.post.CLIENTKEY, {
                 method: "POST",
                 headers:{
                     'content-type': 'application/json',
                     'Accept': 'application/json'
                 },
-                body: JSON.stringify({clientKey: "currClientKey"})
-            }).then(res => {
+                body: JSON.stringify(currClientKey)
+            })
+            .then(res => {
                 res.json().then(body => {
                     resolve(body.clientKey);
                 });
-            }).catch(error => {
+            })
+            .catch(error => {
                 reject(error);
             })
-        }).then(function(clientKey){
+
+        })
+        .then(function(clientKey){
+            //overwrite clientKey and save it to hard disk 
             finalClientKey = clientKey;
+            chrome.storage.local.set({clientKey: clientKey})
             resolve(finalClientKey);
-        }).catch(function(error){
+        })
+        .catch(function(error){
             console.error("error while checking clientKey: ", error);
             reject();
         })
@@ -93,7 +106,7 @@ async function initUsername(){
                 'content-type': 'application/json',
                 'Accept': 'application/json'
             },
-            body: JSON.stringify({clientKey: clientKey})
+            body: JSON.stringify({clientKey: clientKey, type: "get"})
         }).then(res => {
             res.json().then(body => {
                 resolve(body.username);

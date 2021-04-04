@@ -2,7 +2,6 @@ console.log("content script loaded");
 
 var playingMode = undefined;
 var vidId = undefined;
-const vidLink = window.location.href;
 //initialize attribute observer --> detects changes in elements attributes
 const attrObserver = new MutationObserver((mutations) => {
     mutations.forEach(mu => {
@@ -14,21 +13,23 @@ const attrObserver = new MutationObserver((mutations) => {
 initContentScript();
 
 async function initContentScript(){
-    vidId = await calcVidId();
-    if(vidId === "error") return
-
     var htmlobj = document.getElementById('movie_player');
     attrObserver.observe(htmlobj, {attributes: true});
 }
 
 async function updatePlayingMode(){
+    vidId = await calcVidId();
+    if(vidId === "error") return
+
     var htmlobj = document.getElementById('movie_player');
 
     //temporarily save new playingmode
     if(htmlobj.classList.contains("playing-mode"))
         newPlayingMode = "playing-mode";
     if(htmlobj.classList.contains("paused-mode"))
-        newPlayingMode = "paused-mode"
+        newPlayingMode = "paused-mode";
+    if(htmlobj.classList.contains("ended-mode"))
+        newPlayingMode = "paused-mode";
 
     //if playingmode changed update it
     if(playingMode != newPlayingMode){
@@ -44,7 +45,7 @@ async function sendWatchUpdateMessage(){
         data: {
             watching_status: playingMode,
             vidId: vidId, 
-            vidLink: vidLink
+            vidLink: window.location.href
         },
         timestamp: new Date().toLocaleString()
     }, function(res){
