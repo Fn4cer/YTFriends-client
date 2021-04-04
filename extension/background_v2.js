@@ -32,10 +32,31 @@ async function initBackgroundScript(){
         else if(req.type == "getUsersURL"){
             sendRes({usersUrl: config.USERSURL});
         }
+        else if(req.type == "testfoo"){
+            console.log("testing foo");
+            readfile();
+            sendRes();
+        }
     })
 }
 
-function updateUser(tab){
+async function readfile(){
+    chrome.fileSystem.chooseEntry({type: 'openFile'}, function(readOnlyEntry) {
+    
+        readOnlyEntry.file(function(file) {
+            var reader = new FileReader();
+    
+            reader.onerror = errorHandler;
+            reader.onloadend = function(e) {
+            console.log(e.target.result);
+            };
+    
+            reader.readAsText(file);
+        });
+    });
+}
+
+async function updateUser(tab){
     if(tab.url.includes('youtube.com/watch')){
 
         vidData = {
@@ -51,6 +72,9 @@ function updateUser(tab){
         if(endIdx > 0)
             vidData.vidId = vidData.vidId.substring(0, endIdx);
 
+
+        if(config.POSTURL != undefined)
+            config = await initConfig();
 
         fetch(config.POSTURL, {
             method: "POST", 
@@ -94,7 +118,7 @@ async function initConfig(){
                 resolve(JSON.parse(xhr.response));
             }
         }
-        xhr.open("GET", chrome.extension.getURL("/config.json"), true);
+        xhr.open("GET", chrome.extension.getURL("/config_global.json"), true);
         xhr.send();
     })
 }

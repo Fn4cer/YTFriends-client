@@ -9,10 +9,11 @@
     },
     "permissions": [
         "tabs",
-        "<all_urls>"
+        "<all_urls>",
+        "storage"
     ],
     "background": {
-        "scripts": ["background_v2.js"],
+        "scripts": ["background_v3.js"],
         "persistent": true
     },
     "content_scripts": [
