@@ -5,52 +5,18 @@
     <script src="libaries/p5/p5.js" type="text/javascript"></script>
     <script src="popup.js" type="text/javascript"></script>
     <link rel="stylesheet" href="styles/popup.css"/>
+    <meta charset="utf-8">
 </head>
 <body>
     <section id="header">
-        <h1>YOUTUBE FRIENDS</h1>
+      <h1>YOUTUBE FRIENDS</h1>
     </section>
     <input type="text" id="username" name="username" placeholder="put username here">
     <section id="content">
-      <h2>Friends:</h2>
-      <ul id="users">
-        <li>
-          <div class="user">
-            <h3>User1</h3>
-            <ul class="userdetails">
-              <li class="watch_status">watching:</li>
-              <a href="#" target="_blank">
-                <li class="videotitle">imaginärer Videotitel der durchaus ziemlich lang sein kann.</li>
-                <li class="channelname">imaginärer Kanalname</li>
-              </a>
-            </ul>
-          </div>
-        </li>
-        <li>
-          <div class="user">
-            <h3>User1</h3>
-            <ul class="userdetails">
-              <li class="watch_status">watching:</li>
-              <a href="#" target="_blank">
-                <li class="videotitle">imaginärer Videotitel der durchaus ziemlich lang sein kann.</li>
-                <li class="channelname">imaginärer Kanalname</li>
-              </a>
-            </ul>
-          </div>
-        </li>
-        <li>
-          <div class="user">
-            <h3>User1</h3>
-            <ul class="userdetails">
-              <li class="watch_status">watching:</li>
-              <a href="#" target="_blank">
-                <li class="videotitle">imaginärer Videotitel der durchaus ziemlich lang sein kann.</li>
-                <li class="channelname">imaginärer Kanalname</li>
-              </a>
-            </ul>
-          </div>
-        </li>
-      </ul>
+      <div id="loading-wrapper">
+        <div class="loading-spinner"></div>
+        <p class="centered">loading</p>
+      </div>
     </section>
     <input type="button" id="update" name="update" value="update">
 </body>

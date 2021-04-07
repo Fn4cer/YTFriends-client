@@ -1,6 +1,7 @@
 var config;
 var clientKey;
 var username;
+var userdata;
 const CONFIG_PATH = "/config_local.json";
 
 initBackgroundScript();
@@ -24,19 +25,40 @@ async function initBackgroundScript(){
     console.log("username initialized: ", username);
 
     //handle messaging
-    chrome.runtime.onMessage.addListener((req, sender, sendRes) => {
+    chrome.runtime.onMessage.addListener(async (req, sender, sendRes) => {
         switch(req.type){
             case "update_watching":
-                console.log("received update_watching reqeuest", req)
+                console.log("received update_watching request", req)
                 sendWatchingUpdate(req);
-                sendRes({data: undefined, msg: "received update_watching reqeuest", status: "OK"});
+                sendRes({data: undefined, msg: "received update_watching request", status: "OK"});
+                break;
+            case "get_statusBackgroundScript":
+                console.log("received get_statusBackgroundScript request", req)
+                if(username != undefined && config != undefined)
+                    sendRes({data: undefined, msg: "received get_statusBackgroundScript request", status: "OK"});
+                else
+                    sendRes({data: undefined, msg: "received get_statusBackgroundScript request", status: "ERROR"});
+                break;
+            case "get_username":
+                console.log("received get_username reqeuest", req)
+                sendRes({data: {username: username}, msg: "received get_username request", status: "OK"});
+                break;
+            case "update_username":
+                console.log("received update_username reqeuest", req)
+                username = req.data.username;
+                sendRes({data: undefined, msg: "received update_username reqeuest", status: "OK"});
+                break;
+            case "get_config":
+                console.log("received get_config reqeuest", req)
+                sendRes({data: {config: config}, msg: "received get_config reqeuest", status: "OK"});
                 break;
             default:
                 console.error("received unknown reqeuest", req)
                 sendRes({data: undefined, msg: "unknown request type", status: "ERROR"});
         }
+
+        return true;
     });
-    
 }
 
 async function initConfig(){
@@ -137,5 +159,25 @@ async function sendWatchingUpdate(req){
         console.log("successfully postet watching update", res);
     }).catch(error => {
         console.error("error while fetching watching update ", error);
+    })
+}
+
+async function fetchUserdata(){
+    return new Promise((resolve, reject) => {
+        fetch(config.get.USERDATA, {
+            method: "GET",
+            headers:{
+                'content-type': 'application/json',
+                'Accept': 'application/json'
+            }
+        }).then(res => {
+            res.json().then(body => {
+                console.log("body.data: ", body.data)
+                resolve(body.data);
+            });
+        }).catch(error => {
+            console.error("Error while fetching userdata: ", error);
+            reject();
+        })
     })
 }

@@ -5,6 +5,8 @@
   --color-primary: #FF0000;
   --color-secondary: #aaa;
   --color-default: white;
+  --color-background-default: #282c34;
+  --color-background-primary: #3e4148;
 
   color: var(--color-secondary);
   font-family: 'Montserrat', sans-serif;
@@ -16,14 +18,14 @@ html{
 }
 
 body{
-  background: #282828;
-  color:white;
+  background: var(--color-background-default);
+  color: var(--color-default);
   align-items: stretch;
   box-sizing: content-box;
   display: flex;
   flex-direction: column;
   margin: auto;
-  padding: 1rem;
+  padding: 10px 1rem;
   position: relative;
   width: 20rem;
   height: auto;
@@ -61,37 +63,24 @@ a{
   text-decoration: none;
 }
 
-.watch_status{
-  margin-bottom: 5px;
-  color: var(--color-default);
-}
-
-.videotitle{
-  color: var(--color-secondary);
-  margin-bottom: 5px;
-}
-
-.channelname{
-  color: var(--color-default);
-}
-
 section{
-  border: 1px solid white;
+  background-color: var(--color-background-primary);
   border-radius: 5px;
-  margin: 10px 0;
+  margin-bottom: 10px;
   padding: 10px;
 }
 
 input[type="text"]{
-  background: none;
-  border: 1px solid;
-  border-color: white;
+  background: var(--color-background-primary);
   border-radius: 5px;
+  border: none;
   padding: 10px;
+  margin-bottom: 10px;
 }
 
 input[type="text"]:focus{
   outline: none;
+  border: 1px solid;
   border-color: #FF0000;
 }
 
@@ -123,6 +112,47 @@ ul.userdetails{
   margin-top: 5px;
 }
 
+.watch_status{
+  margin-bottom: 5px;
+  color: var(--color-default);
+}
+
+.videotitle{
+  color: var(--color-secondary);
+  margin-bottom: 5px;
+}
+
+.channelname{
+  color: var(--color-default);
+}
+
 .user{
   margin: 0 0 10px 0;
+}
+
+.centered{
+  text-align: center;
+}
+
+#loading-wrapper{
+  display: flex;
+  flex-direction: column;
+}
+
+.loading-spinner{
+  width: 2rem;
+  height: 2rem;
+  display: inline-block;
+  margin: auto;
+
+  border: 3px solid rgba(255,255,255,0.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: 1s spin infinite ease-in-out;
+}
+
+@keyframes spin {
+  to{
+    transform: rotate(360deg);
+  }
 }

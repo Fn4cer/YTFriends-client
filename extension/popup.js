@@ -1,40 +1,110 @@
 var userdata;
+var username;
+var config;
 
 async function setup(){
-    console.log("popup has been opened");
     noCanvas();
-    
-    updatePopup();
-    
+    console.log("popup has been opened");
+    initPopup();
+}
+
+async function initPopup(){
+    //ckeck if client has valid key and config is loaded
+    var bsStatus = await initCheckBackgroundScript();
+    if(bsStatus && bsStatus.status === "OK"){
+        console.log("Backgrounsscript initialized");
+    }else{
+        console.error("Backgroundscript not initialized --> try reloading extension");
+        showError({msg: "Backgroundscript not initialized. Try reloading the extension."});
+        return;
+    }
+
+    //get clients username
+    username = await requestUsername();
+    console.log("client username = ", username);
+
+    //get config
+    config = await requestConfig();
+    console.log("config loaded: ", config);
+
+    //start listening on updateButton
     var updatebtn = select('#update');
     updatebtn.mousePressed(updatePopup);
-
-    var input_username = select('#username');
-    input_username.input(updateUsername);
+    
+    //fetch current userdata
+    userdata = await fetchUserdata();
+    console.log("userdata: ", userdata);
+    if(userdata === undefined){
+        showError({msg: "Failed to fetch userdate. Try updateing Popup. Server may be offline..."})
+        return;
+    }
+    
+    buildPopup();
 }
 
-async function getUsersURL(){
+async function initCheckBackgroundScript(){
     return new Promise((resolve, reject) => {
-        chrome.runtime.sendMessage({type: "getUsersURL"}, function(res){
-            console.log(res.usersUrl);
-            resolve(res.usersUrl);
+        chrome.runtime.sendMessage({type: "get_statusBackgroundScript"}, function(res){
+            resolve(res);
         })
-    });
+    })
 }
 
-async function getNewUserdata(){
-    var url = await getUsersURL();
+async function requestConfig(){
     return new Promise((resolve, reject) => {
-        console.log("updating userdata...");
-        console.log("hier: " + url);
-        httpGet(url, 'json', function(res){
-            console.log(res.data)
-            resolve(res.data);
-        }, function(error){
-            console.log("unable to get server data");
-            reject(undefined);
+        chrome.runtime.sendMessage({type: "get_config"}, function(res){
+            resolve(res.data.config);
         })
-    });
+    })
+}
+
+async function requestUsername(){
+    return new Promise((resolve, reject) => {
+        chrome.runtime.sendMessage({type: "get_username"}, function(res){
+            resolve(res.data.username);
+        })
+    })
+}
+
+async function fetchUserdata(){
+    return new Promise((resolve, reject) => {
+        fetch(config.get.USERDATA, {
+            method: "GET",
+            headers:{
+                'content-type': 'application/json',
+                'Accept': 'application/json'
+            }
+        }).then(res => {
+            res.json().then(body => {
+                console.log("body.data: ", body.data)
+                resolve(body.data);
+            });
+        }).catch(error => {
+            console.error("Error while fetching userdata: ", error);
+            showError({msg: "Error while fetching userdata"});
+            reject();
+        })
+    })
+}
+
+async function sendNewUsernameToBackground(){
+    chrome.runtime.sendMessage({type: "update_username", data: {username: select('#username').value()}}, function(res){})
+}
+
+async function buildPopup(){
+
+    //populate username input
+    const usernameInput = select('#username');
+    usernameInput.attribute('value', username);
+
+    //listen on username changes
+    usernameInput.input(sendNewUsernameToBackground);
+
+    //clear content section
+    clearSection('#content', 'div'); 
+
+    //render userdata
+    renderUserdata();
 }
 
 function createListItem(element){
@@ -51,44 +121,75 @@ function createListItem(element){
     userdetailsListItem.attribute('class', 'userdetails');
     userItem.child(userdetailsListItem);
     //create watchstatus
-    var watchstatusItem = createElement('li', element.watch_status);
+    var watching_content;
+    if(element.watching_status === "playing-mode")
+        watching_content = "watching";
+    else
+        watching_content = element.timestamp
+    var watchstatusItem = createElement('li', watching_content);
     watchstatusItem.attribute('class', 'watch_status');
     userdetailsListItem.child(watchstatusItem);
     //create link item for video
     var linkItem = createElement('a');
-    linkItem.attribute('href', element.videoLink);
+    linkItem.attribute('href', element.vidLink);
     linkItem.attribute('target', '_blank');
     userdetailsListItem.child(linkItem);
     //create videotitle
-    var vidTitleItem = createElement('li', element.videoTitle);
+    var vidTitleItem = createElement('li', element.vidTitle);
     vidTitleItem.attribute('class', 'videotitle');
     linkItem.child(vidTitleItem);
     //create channelname
-    var channelnameItem = createElement('li', element.videoChannelname);
+    var channelnameItem = createElement('li', element.vidChannelname);
     channelnameItem.attribute('class', 'channelname');
     linkItem.child(channelnameItem);
 
     return listItem;
 }
 
-async function updatePopup(){
-    console.log("updating popup...");
-    userdata = await getNewUserdata();
-    var liste = select('#users');
-    console.log(userdata);
-    if(userdata != undefined){
-        clearList();
-        userdata.forEach(element => {
-            var newListItem = createListItem(element);
-            liste.child(newListItem);
-        });
-    }
+function clearSection(parentQueryString, childQueryString){
+    const parentElement = select(parentQueryString);
+    var oldElements = selectAll(childQueryString, parentElement);
+    oldElements.forEach(element => element.remove());
+} 
 
-    chrome.runtime.sendMessage({
-        type: "getUsername"
-    }, function(res){
-        select('#username').attribute('value', res.username);
+function renderUserdata(){
+    const contentSection = select('#content');
+    
+    //create users list
+    var listElement = createElement('ul');
+    listElement.attribute('id', 'users');
+    contentSection.child(listElement);
+
+    //create child elements and attach to listElement
+    userdata.forEach(user => {
+        var newChildElement = createListItem(user);
+        listElement.child(newChildElement);
     })
+}
+
+function showError(data){
+    clearSection('#content', '#users');
+    clearSection('#content', '#loading-wrapper');
+    const contentElement = select('#content');
+    var errorHeadline = createElement('h2', "Error");
+    contentElement.child(errorHeadline);
+    var errorMessage = createElement('p', data.msg);
+    contentElement.child(errorMessage);
+}
+
+function showLoading(){
+    clearSection('#content', '#users');
+    clearSection('#content', '#loading-wrapper');
+    const contentElement = select('#content');
+    var loadingWrapperElement = createElement('div');
+    loadingWrapperElement.attribute('id', 'loading-wrapper');
+    contentElement.child(loadingWrapperElement);
+    var loadingSpinnerElement = createElement('div');
+    loadingSpinnerElement.attribute('class', 'loading-spinner');
+    loadingWrapperElement.child(loadingSpinnerElement);
+    var loadingMessage = createElement('p', "loading");
+    loadingMessage.attribute('class', 'centered');
+    loadingWrapperElement.child(loadingMessage);
 }
 
 function clearList(){
@@ -99,10 +200,8 @@ function clearList(){
     });
 }
 
-function updateUsername(){
-    var username = select('#username').value();
-    chrome.runtime.sendMessage({
-        type: "updateUsername",
-        username: username
-    })
+function updatePopup(){
+    console.log("updating");
+    showLoading();
+    initPopup();
 }
