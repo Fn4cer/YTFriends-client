@@ -5,6 +5,9 @@ var config;
 async function setup(){
     noCanvas();
     console.log("popup has been opened");
+    //start listening on updateButton
+    var updatebtn = select('#update');
+    updatebtn.mousePressed(updatePopup);
     initPopup();
 }
 
@@ -26,10 +29,6 @@ async function initPopup(){
     //get config
     config = await requestConfig();
     console.log("config loaded: ", config);
-
-    //start listening on updateButton
-    var updatebtn = select('#update');
-    updatebtn.mousePressed(updatePopup);
     
     //fetch current userdata
     userdata = await fetchUserdata();

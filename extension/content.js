@@ -28,7 +28,7 @@ async function initContentScript(){
         lastUrl = window.location.href;
         var htmlobj = document.getElementById('movie_player');
         attrObserver.observe(htmlobj, {attributes: true});
-        sendWatchUpdateMessage();
+        updatePlayingMode();
     }
 }
 

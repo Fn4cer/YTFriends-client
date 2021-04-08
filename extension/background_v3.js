@@ -2,7 +2,7 @@ var config;
 var clientKey;
 var username;
 var userdata;
-const CONFIG_PATH = "/config_local.json";
+const CONFIG_PATH = "/config_global.json";
 
 initBackgroundScript();
 
