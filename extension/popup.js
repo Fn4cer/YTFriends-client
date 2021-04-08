@@ -102,6 +102,8 @@ async function buildPopup(){
 
     //clear content section
     clearSection('#content', 'div'); 
+    clearSection('#content', 'h2'); 
+    clearSection('#content', 'p'); 
 
     //render userdata
     renderUserdata();

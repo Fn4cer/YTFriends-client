@@ -2,6 +2,7 @@ console.log("content script loaded");
 
 var playingMode = undefined;
 var vidId = undefined;
+var lastUrl;
 //initialize attribute observer --> detects changes in elements attributes
 const attrObserver = new MutationObserver((mutations) => {
     mutations.forEach(mu => {
@@ -10,11 +11,25 @@ const attrObserver = new MutationObserver((mutations) => {
     });
 });
 
-initContentScript();
+if(window.location.href.includes('youtube.com')){
+    setInterval(checkUrl, 5000);
+}
+
+async function checkUrl(){
+    if(lastUrl != window.location.href){
+        console.log("url changed");
+        initContentScript();
+    }
+}
 
 async function initContentScript(){
-    var htmlobj = document.getElementById('movie_player');
-    attrObserver.observe(htmlobj, {attributes: true});
+    //check if url is vid url
+    if(window.location.href.includes('watch?')){
+        lastUrl = window.location.href;
+        var htmlobj = document.getElementById('movie_player');
+        attrObserver.observe(htmlobj, {attributes: true});
+        sendWatchUpdateMessage();
+    }
 }
 
 async function updatePlayingMode(){
